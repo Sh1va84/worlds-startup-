@@ -5,6 +5,7 @@ export interface World {
   name: string;
   tagline: string;
   videoSrc: string;
+  videoStartSeconds: number;
   theme: {
     accent: string;
     foreground: string;

@@ -13,8 +13,9 @@ export function CinematicHero() {
   useEffect(() => {
     const activeVideo = videoRefs.current[activeIndex];
     if (!activeVideo || isPaused) return;
+    activeVideo.currentTime = activeWorld.videoStartSeconds;
     activeVideo.play().catch(() => undefined);
-  }, [activeIndex, isPaused]);
+  }, [activeIndex, activeWorld.videoStartSeconds, isPaused]);
 
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
@@ -53,6 +54,11 @@ export function CinematicHero() {
             preload={index === 0 ? "auto" : "metadata"}
             ref={(element) => { videoRefs.current[index] = element; }}
             src={world.videoSrc}
+            onLoadedMetadata={(event) => {
+              const video = event.currentTarget;
+              video.currentTime = world.videoStartSeconds;
+              if (index === activeIndex && !isPaused) video.play().catch(() => undefined);
+            }}
           />
         ))}
       </div>

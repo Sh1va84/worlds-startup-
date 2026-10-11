@@ -26,7 +26,7 @@ button { font: inherit; }
 .hero__controls { bottom: 45px; right: 32px; gap: 20px; }
 .hero__controls button:hover { color: var(--world-accent); }
 .hero__progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,.2); }
-.hero__progress span { display: block; height: 100%; background: var(--world-accent); animation: progress 9s linear; }
+.hero__progress span { display: block; height: 100%; background: var(--world-accent); animation: progress 10s linear; }
 @keyframes progress { from { width: 0; } to { width: 100%; } }
 @keyframes title-in { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
