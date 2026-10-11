@@ -22,3 +22,6 @@ Thumbs.db
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Local prototype media (do not commit unlicensed footage)
+public/assets/videos/**/*.mp4
