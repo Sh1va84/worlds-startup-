@@ -20,7 +20,10 @@ export function CinematicHero() {
   const [note, setNote] = useState("");
   const [isMuted, setIsMuted] = useState(true);
   const [breaths, setBreaths] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const rootRef = useRef<HTMLElement | null>(null);
+  const holdTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -28,6 +31,10 @@ export function CinematicHero() {
     video.muted = isMuted;
     if (state !== "entry") video.play().catch(() => undefined);
   }, [isMuted, state]);
+
+  useEffect(() => () => {
+    if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current);
+  }, []);
 
   if (!deepWorld) return null;
 
@@ -38,11 +45,30 @@ export function CinematicHero() {
       return Math.min(count + 1, 3);
     });
   };
+  const startHolding = () => {
+    if (isHolding) return;
+    setIsHolding(true);
+    holdTimerRef.current = window.setTimeout(() => {
+      setIsHolding(false);
+      registerBreath();
+    }, 2600);
+  };
+  const stopHolding = () => {
+    if (holdTimerRef.current) window.clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = null;
+    setIsHolding(false);
+  };
+  const moveSignal = (event: React.PointerEvent<HTMLElement>) => {
+    rootRef.current?.style.setProperty("--pointer-x", `${event.clientX}px`);
+    rootRef.current?.style.setProperty("--pointer-y", `${event.clientY}px`);
+    rootRef.current?.style.setProperty("--pointer-opacity", "1");
+  };
 
   return (
-    <main className={`deep deep--${state}`}>
+    <main className={`deep deep--${state}`} onPointerLeave={() => rootRef.current?.style.setProperty("--pointer-opacity", "0")} onPointerMove={moveSignal} ref={rootRef}>
       <video aria-hidden="true" className="deep__film" loop muted={isMuted} playsInline preload="auto" ref={videoRef} src={deepWorld.videoSrc} onLoadedMetadata={(event) => { event.currentTarget.currentTime = deepWorld.videoStartSeconds; }} />
       <div className="deep__wash" /><div className="deep__grain" aria-hidden="true" /><div className="deep__scanline" aria-hidden="true" />
+      <div className="deep__interaction-light" aria-hidden="true" /><div className="deep__pointer" aria-hidden="true" />
 
       <header className="deep__header">
         <button className="deep__brand" onClick={() => setState("entry")} aria-label="Return to the Deep entry">WORLDS<span>/</span>DEEP</button>
@@ -69,7 +95,7 @@ export function CinematicHero() {
       </section>}
 
       {state === "reset" && <section className="deep__reset">
-        <p className="deep__kicker">NO FIXING. JUST A PAUSE.</p><div className="deep__orb" aria-hidden="true"><span /></div><h1>Let the next breath<br />be <em>yours.</em></h1><p className="deep__body">In for four. Hold for four. Let the rest leave slowly.</p><button className="deep__breath" onClick={registerBreath}><span>{breaths === 0 ? "BEGIN" : breaths === 1 ? "AGAIN" : "ONE MORE"}</span><b>{breaths + 1}/3</b></button>
+        <p className="deep__kicker">NO FIXING. JUST A PAUSE.</p><div className={isHolding ? "deep__orb is-holding" : "deep__orb"} aria-hidden="true"><span /></div><h1>Let the next breath<br />be <em>yours.</em></h1><p className="deep__body">Press and hold. Let the signal expand, then let it go.</p><button aria-label="Press and hold for one breath" className={isHolding ? "deep__breath is-holding" : "deep__breath"} onPointerCancel={stopHolding} onPointerDown={startHolding} onPointerLeave={stopHolding} onPointerUp={stopHolding}><span>{isHolding ? "STAY WITH IT" : breaths === 0 ? "HOLD TO BEGIN" : breaths === 1 ? "HOLD AGAIN" : "ONE MORE HOLD"}</span><b>{breaths + 1}/3</b></button>
       </section>}
 
       {state === "done" && <section className="deep__done">
